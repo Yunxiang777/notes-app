@@ -1,12 +1,21 @@
 import { Request, Response, NextFunction } from "express";
 import * as authService from "../services/auth.service";
+import { RegisterDto } from '../dto/register.dto';
 
+// 用戶註冊
 export async function register(req: Request, res: Response, next: NextFunction) {
     try {
-        const { email, password } = req.body;
-        const user = await authService.register(email, password);
-        res.status(201).json({ id: user.id, email: user.email });
-    } catch (err) {
+        const dto: RegisterDto = req.body;
+        const result = await authService.register(dto);
+
+        // 成功
+        res.status(201).json({
+            success: true,
+            data: result,
+            message: 'User registered successfully',
+        });
+    } catch (err: any) {
+        // 傳遞錯誤處理給 middleware
         next(err);
     }
 }
