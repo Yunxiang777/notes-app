@@ -24,15 +24,10 @@ export async function register(dto: IRegisterRequest): Promise<IRegisterResponse
     try {
         // 1. 檢查 email 是否已經存在
         const [existingUsers] = await conn.query<ExistingUserRow[]>(
-            'SELECT id FROM users WHERE email = ?',
-            [email]
-        );
+            'SELECT id FROM users WHERE email = ?', [email]);
 
         if (existingUsers.length > 0) {
-            throw {
-                status: 409,
-                message: 'Email already in use',
-            };
+            throw { status: 409, message: 'Email already in use' };
         }
 
         // 2. 加密密碼
@@ -46,25 +41,10 @@ export async function register(dto: IRegisterRequest): Promise<IRegisterResponse
 
         const userId = result.insertId;
 
-        const token = jwt.sign(
-            {
-                userId: userId.toString(),  // 改成 string
-                email
-            },
-            JWT_SECRET,
-            {
-                expiresIn: JWT_EXPIRES_IN,
-            }
-        );
+        const token = jwt.sign({ userId, email }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN, });
 
         // 5. 返回用戶資料和 token
-        return {
-            user: {
-                id: userId,
-                email,
-            },
-            token,
-        };
+        return { user: { id: userId, email, }, token };
 
     } finally {
         conn.release();
@@ -80,7 +60,7 @@ export async function login(email: string, password: string) {
         const match = await bcrypt.compare(password, user.password_hash);
         if (!match) throw { status: 401, message: "Invalid credentials" };
 
-        const token = jwt.sign({ userId: user.id, email }, JWT_SECRET as string, { expiresIn: JWT_EXPIRES_IN as string });
+        const token = jwt.sign({ userId: user.id, email }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
         return token;
     } finally {
         conn.release();
