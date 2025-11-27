@@ -10,10 +10,10 @@ const router = Router();
 
 router.use(requireAuth);
 
-router.get("/", notesController.listNotes);
-router.post("/", validateDto(CreateNoteDtoSchema), notesController.createNote);
-router.get("/:id", validateDto(NoteIdDtoSchema, "params"), notesController.getNote);
-router.put("/:id", validateDto(UpdateNoteDtoSchema), notesController.updateNote);
-router.delete("/:id", validateDto(NoteIdDtoSchema, "params"), notesController.deleteNote);
+router.get("/", notesController.listNotes); //取得所有
+router.post("/", validateDto(CreateNoteDtoSchema), notesController.createNote); //新增資料
+router.get("/:id", validateDto(NoteIdDtoSchema, "params"), notesController.getNote); //取得資料
+router.put("/:id", validateDto(UpdateNoteDtoSchema), notesController.updateNote); //更新資料
+router.delete("/:id", validateDto(NoteIdDtoSchema, "params"), notesController.deleteNote); //刪除資料
 
 export default router;
