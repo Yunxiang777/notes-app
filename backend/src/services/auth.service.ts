@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { pool } from "../config/db";
-import { IRegisterRequest, IRegisterResponse } from "../interfaces/auth.interface";
+import { IRegisterRequest, IRegisterResponse, ILoginRequest, ILoginResponse } from "../interfaces/auth.interface";
 import { ResultSetHeader } from "mysql2";
 import type { UserRow, ExistingUserRow } from "../types/db/user";
 import { StringValue } from "ms";
@@ -59,7 +59,8 @@ export async function register(dto: IRegisterRequest): Promise<IRegisterResponse
 // ------------------------------
 // 登入
 // ------------------------------
-export async function login(email: string, password: string) {
+export async function login(dto: ILoginRequest): Promise<ILoginResponse> {
+    const { email, password } = dto;
     const conn = await pool.getConnection();
 
     try {

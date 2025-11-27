@@ -25,8 +25,7 @@ export async function register(req: Request, res: Response, next: NextFunction) 
 export async function login(req: Request, res: Response, next: NextFunction) {
     try {
         const dto: LoginDto = req.body;
-        const { email, password } = dto;
-        const result = await authService.login(email, password);
+        const result = await authService.login(dto);
 
         res.json({
             success: true,
