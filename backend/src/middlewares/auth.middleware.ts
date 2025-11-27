@@ -8,7 +8,7 @@ import { AUTH_SCHEME, ERROR_MESSAGES } from "../config/constants"; //常數
 dotenv.config();
 
 // JWT SECRET，嚴重錯誤檢查
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET || "secret";
 if (!JWT_SECRET) {
     console.error("FATAL ERROR: JWT_SECRET environment variable is not defined.");
 }

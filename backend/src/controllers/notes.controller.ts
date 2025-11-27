@@ -28,6 +28,7 @@ export async function createNote(req: AuthRequest, res: Response, next: NextFunc
 export async function getNote(req: AuthRequest, res: Response, next: NextFunction) {
     try {
         const params = req.params as NoteIdDto;
+        console.log(params);
         const note = await notesService.getNote(req.user!.id, Number(params.id));
         res.json(note);
     } catch (err) {

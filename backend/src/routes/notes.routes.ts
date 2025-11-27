@@ -12,8 +12,8 @@ router.use(requireAuth);
 
 router.get("/", notesController.listNotes);
 router.post("/", validateDto(CreateNoteDtoSchema), notesController.createNote);
-router.get("/:id", validateDto(NoteIdDtoSchema), notesController.getNote);
+router.get("/:id", validateDto(NoteIdDtoSchema, "params"), notesController.getNote);
 router.put("/:id", validateDto(UpdateNoteDtoSchema), notesController.updateNote);
-router.delete("/:id", validateDto(NoteIdDtoSchema), notesController.deleteNote);
+router.delete("/:id", validateDto(NoteIdDtoSchema, "params"), notesController.deleteNote);
 
 export default router;
