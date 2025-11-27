@@ -31,7 +31,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes';
-// import { errorHandler } from './middlewares/error-handler.middleware';
+import { errorHandler } from './middlewares/error-handler.middleware';
 
 dotenv.config();
 
@@ -44,8 +44,8 @@ app.use(express.json());
 // 路由
 app.use('/api/auth', authRoutes);
 
-// 錯誤處理 middleware (必須放在最後)
-// app.use(errorHandler);
+// 錯誤處理
+app.use(errorHandler);
 
 export default app;
 

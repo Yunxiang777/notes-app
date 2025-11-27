@@ -1,7 +1,7 @@
-/**
- * 錯誤處理 Middleware
- * 統一處理所有錯誤
- */
+import { Request, Response, NextFunction } from 'express';
+
+// 錯誤處理，統一處理所有錯誤
+// next: NextFunction 必要參數，確保 express 抓取到錯誤處理格式
 export function errorHandler(err: any, req: Request, res: Response, next: NextFunction) {
     console.error('Error:', err);
 
