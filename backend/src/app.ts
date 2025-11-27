@@ -2,7 +2,7 @@
 // import cors from "cors";
 // import dotenv from "dotenv";
 // import authRoutes from "./routes/auth.routes";
-// import notesRoutes from "./routes/notes.routes";
+import notesRoutes from "./routes/notes.routes";
 
 // dotenv.config();
 
@@ -42,7 +42,8 @@ app.use(cors());
 app.use(express.json());
 
 // 路由
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes); // 登入
+app.use("/api/notes", notesRoutes); // 記事本
 
 // 錯誤處理
 app.use(errorHandler);
