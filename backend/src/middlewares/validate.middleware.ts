@@ -9,10 +9,10 @@ export function validateDto(schema: ZodSchema) {
             req.body = validated;
             next();
         } catch (error) {
-            // 如果驗證失敗
+            // 驗證失敗
             if (error instanceof ZodError) {
                 // 格式化錯誤訊息
-                const errors = error.errors.map(err => ({
+                const errors = error.issues.map(err => ({
                     field: err.path.join('.'),
                     message: err.message,
                 }));
@@ -26,7 +26,7 @@ export function validateDto(schema: ZodSchema) {
                 });
             }
 
-            // 其他未預期的錯誤
+            // 未預期錯誤
             next(error);
         }
     };
