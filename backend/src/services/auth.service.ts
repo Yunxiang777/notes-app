@@ -1,6 +1,3 @@
-import { env } from "../config/env";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import { pool } from "../config/db";
 import {
   IRegisterRequest,
@@ -10,6 +7,11 @@ import {
 } from "../types/api/auth";
 import { ResultSetHeader } from "mysql2";
 import type { UserRow, ExistingUserRow } from "../types/db/user";
+import {
+  generateToken,
+  hashPassword,
+  comparePassword,
+} from "../utils/jwt.utils";
 
 // 註冊
 export async function register(
@@ -30,7 +32,7 @@ export async function register(
     }
 
     // hash 密碼
-    const passwordHash = await bcrypt.hash(password, 10);
+    const passwordHash = await hashPassword(password);
 
     // 寫入資料庫
     const [result] = await conn.query<ResultSetHeader>(
@@ -41,9 +43,7 @@ export async function register(
     const userId = result.insertId;
 
     // 發 Token
-    const token = jwt.sign({ userId, email }, env.JWT_SECRET, {
-      expiresIn: env.JWT_EXPIRES_IN,
-    });
+    const token = generateToken({ userId, email });
 
     return {
       user: { id: userId, email },
@@ -72,18 +72,13 @@ export async function login(dto: ILoginRequest): Promise<ILoginResponse> {
     const user = rows[0];
 
     // 密碼比對
-    const isMatch = await bcrypt.compare(password, user.password_hash);
+    const isMatch = await comparePassword(password, user.password_hash);
     if (!isMatch) {
       throw { status: 401, message: "Invalid email or password" };
     }
 
-    const token = jwt.sign(
-      { userId: user.id, email: user.email },
-      env.JWT_SECRET,
-      {
-        expiresIn: env.JWT_EXPIRES_IN,
-      }
-    );
+    // token
+    const token = generateToken({ userId: user.id, email: user.email });
 
     return {
       user: { id: user.id, email: user.email },
