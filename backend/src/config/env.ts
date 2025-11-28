@@ -1,11 +1,11 @@
 import dotenv from "dotenv";
-
+import { StringValue } from "ms";
 dotenv.config();
 
 export const env = {
-    JWT_SECRET: process.env.JWT_SECRET ?? "secret",
-    JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN ?? "7d",
-    DATABASE_URL: process.env.DATABASE_URL ?? "mysql://localhost/notes",
+  JWT_SECRET: process.env.JWT_SECRET ?? "secret",
+  JWT_EXPIRES_IN: (process.env.JWT_EXPIRE as StringValue) ?? "7d",
+  DATABASE_URL: process.env.DATABASE_URL ?? "mysql://localhost/notes",
 } as const;
 
 // 類型推斷
