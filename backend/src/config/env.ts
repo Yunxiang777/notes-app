@@ -7,6 +7,7 @@ export const env = {
   JWT_EXPIRES_IN: (process.env.JWT_EXPIRE as StringValue) ?? "7d",
   DATABASE_URL: process.env.DATABASE_URL ?? "mysql://localhost/notes",
   NODE_ENV: process.env.NODE_ENV === "production",
+  PORT: process.env.PORT ?? "4000",
 } as const;
 
 // 類型推斷

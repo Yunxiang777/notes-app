@@ -1,4 +1,3 @@
-// src/controllers/notes.controller.ts
 import { Response, NextFunction } from "express";
 import * as notesService from "../services/notes.service";
 import { AuthRequest } from "../types/auth";
@@ -6,7 +5,7 @@ import { CreateNoteDto } from "../dto/note-create.dto";
 import { UpdateNoteDto } from "../dto/note-update.dto";
 import { NoteIdDto } from "../dto/note-id.dto";
 
-// 取得所有
+// 所有
 export async function listNotes(
   req: AuthRequest,
   res: Response,
@@ -14,12 +13,13 @@ export async function listNotes(
 ) {
   try {
     const notes = await notesService.listNotes(req.user!.id);
-    res.json(notes);
+    return res.json({ success: true, data: notes });
   } catch (err) {
     next(err);
   }
 }
 
+// 新增
 export async function createNote(
   req: AuthRequest,
   res: Response,
@@ -32,12 +32,13 @@ export async function createNote(
       body.title,
       body.content ?? ""
     );
-    res.status(201).json(note);
+    return res.status(201).json({ success: true, data: note });
   } catch (err) {
     next(err);
   }
 }
 
+// 取得目標
 export async function getNote(
   req: AuthRequest,
   res: Response,
@@ -46,12 +47,13 @@ export async function getNote(
   try {
     const params = req.params as NoteIdDto;
     const note = await notesService.getNote(req.user!.id, Number(params.id));
-    res.json(note);
+    return res.json({ success: true, data: note });
   } catch (err) {
     next(err);
   }
 }
 
+// 更新
 export async function updateNote(
   req: AuthRequest,
   res: Response,
@@ -65,12 +67,13 @@ export async function updateNote(
       Number(params.id),
       body
     );
-    res.json(note);
+    return res.json({ success: true, data: note });
   } catch (err) {
     next(err);
   }
 }
 
+// 刪除
 export async function deleteNote(
   req: AuthRequest,
   res: Response,
@@ -79,7 +82,7 @@ export async function deleteNote(
   try {
     const params = req.params as NoteIdDto;
     await notesService.deleteNote(req.user!.id, Number(params.id));
-    res.status(204).send();
+    return res.status(204).send();
   } catch (err) {
     next(err);
   }

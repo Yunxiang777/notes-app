@@ -1,4 +1,5 @@
 import { pool } from "../config/db";
+import { BadRequest, Forbidden, NotFound } from "../utils/http";
 
 export interface NotePayload {
   title?: string;
@@ -23,18 +24,22 @@ export async function createNote(
   title: string,
   content: string
 ) {
-  if (!title) throw { status: 400, message: "Title required" };
+  if (!title) throw BadRequest("Title required");
+
   const conn = await pool.getConnection();
   try {
     const [result]: any = await conn.query(
       "INSERT INTO notes (user_id, title, content) VALUES (?, ?, ?)",
       [userId, title, content]
     );
+
     const id = result.insertId;
+
     const [rows]: any = await conn.query(
       "SELECT id, title, content, created_at, updated_at FROM notes WHERE id = ?",
       [id]
     );
+
     return rows[0];
   } finally {
     conn.release();
@@ -48,9 +53,12 @@ export async function getNote(userId: number, id: number) {
       "SELECT id, title, content, created_at, updated_at, user_id FROM notes WHERE id = ?",
       [id]
     );
-    if (rows.length === 0) throw { status: 404, message: "Note not found" };
+    if (rows.length === 0) throw NotFound("Note not found");
+
     const note = rows[0];
-    if (note.user_id !== userId) throw { status: 403, message: "Forbidden" };
+
+    if (note.user_id !== userId) throw Forbidden("Forbidden");
+
     return {
       id: note.id,
       title: note.title,
@@ -74,8 +82,8 @@ export async function updateNote(
       "SELECT user_id FROM notes WHERE id = ?",
       [id]
     );
-    if (rows.length === 0) throw { status: 404, message: "Note not found" };
-    if (rows[0].user_id !== userId) throw { status: 403, message: "Forbidden" };
+    if (rows.length === 0) throw NotFound("Note not found");
+    if (rows[0].user_id !== userId) throw Forbidden("Forbidden");
 
     const updates: string[] = [];
     const values: any[] = [];
@@ -89,10 +97,10 @@ export async function updateNote(
       values.push(payload.content);
     }
 
-    if (updates.length === 0)
-      throw { status: 400, message: "Nothing to update" };
+    if (updates.length === 0) throw BadRequest("Nothing to update");
 
     values.push(id);
+
     await conn.query(
       `UPDATE notes SET ${updates.join(", ")} WHERE id = ?`,
       values
@@ -102,6 +110,7 @@ export async function updateNote(
       "SELECT id, title, content, created_at, updated_at FROM notes WHERE id = ?",
       [id]
     );
+
     return newRows[0];
   } finally {
     conn.release();
@@ -115,8 +124,9 @@ export async function deleteNote(userId: number, id: number) {
       "SELECT user_id FROM notes WHERE id = ?",
       [id]
     );
-    if (rows.length === 0) throw { status: 404, message: "Note not found" };
-    if (rows[0].user_id !== userId) throw { status: 403, message: "Forbidden" };
+    if (rows.length === 0) throw NotFound("Note not found");
+    if (rows[0].user_id !== userId) throw Forbidden("Forbidden");
+
     await conn.query("DELETE FROM notes WHERE id = ?", [id]);
   } finally {
     conn.release();
