@@ -4,6 +4,7 @@ import cors from "cors";
 import authRoutes from "./routes/auth.routes";
 import { errorHandler } from "./middlewares/error-handler.middleware";
 import cookieParser from "cookie-parser";
+import { NotFound } from "./utils/http";
 
 const app = express();
 
@@ -15,6 +16,11 @@ app.use(express.json());
 // 路由
 app.use("/api/auth", authRoutes); // 登入
 app.use("/api/notes", notesRoutes); // 記事本
+
+// 404 — 未匹配任何路由
+app.use((req, res, next) => {
+  next(NotFound("route_not_found"));
+});
 
 // 錯誤處理
 app.use(errorHandler);
