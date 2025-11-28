@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import * as authService from "../services/auth.service";
 import { RegisterDto } from "../dto/register.dto";
 import { LoginDto } from "../dto/login.dto";
+import { setAuthCookie, sendSuccess } from "../utils/response.util";
 
 // 用戶註冊
 export async function register(
@@ -13,22 +14,10 @@ export async function register(
     const dto: RegisterDto = req.body;
     const result = await authService.register(dto);
 
-    // 設定 HttpOnly Cookie
-    res.cookie("authToken", result.token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 天
-    });
-
-    // 成功
-    res.status(201).json({
-      success: true,
-      data: {
-        user: result.user,
-      },
-      message: "User registered successfully",
-    });
+    // set token
+    setAuthCookie(res, result.token);
+    // 註冊成功
+    sendSuccess(res, 201, result.user, "User registered successfully");
   } catch (err: any) {
     // 失敗
     next(err);
@@ -41,11 +30,10 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     const dto: LoginDto = req.body;
     const result = await authService.login(dto);
 
-    res.json({
-      success: true,
-      user: result.user,
-      token: result.token,
-    });
+    // set token
+    setAuthCookie(res, result.token);
+    // 登入成功
+    sendSuccess(res, 200, result.user, "User logged in successfully");
   } catch (err) {
     next(err);
   }

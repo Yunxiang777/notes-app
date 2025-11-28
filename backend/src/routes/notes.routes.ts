@@ -12,8 +12,23 @@ router.use(requireAuth);
 
 router.get("/", notesController.listNotes); //取得所有
 router.post("/", validateDto(CreateNoteDtoSchema), notesController.createNote); //新增資料
-router.get("/:id", validateDto(NoteIdDtoSchema, "params"), notesController.getNote); //取得資料
-router.put("/:id", validateDto(UpdateNoteDtoSchema), notesController.updateNote); //更新資料
-router.delete("/:id", validateDto(NoteIdDtoSchema, "params"), notesController.deleteNote); //刪除資料
+//取得目標資料
+router.get(
+  "/:id",
+  validateDto(NoteIdDtoSchema, "params"),
+  notesController.getNote
+);
+//更新資料
+router.put(
+  "/:id",
+  validateDto(UpdateNoteDtoSchema),
+  notesController.updateNote
+);
+//刪除資料
+router.delete(
+  "/:id",
+  validateDto(NoteIdDtoSchema, "params"),
+  notesController.deleteNote
+);
 
 export default router;
