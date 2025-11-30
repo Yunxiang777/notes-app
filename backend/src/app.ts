@@ -9,7 +9,12 @@ import { NotFound } from "./utils/http";
 const app = express();
 
 // middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173", // fronted URL domain
+    credentials: true, // 啟用 Cookie
+  })
+);
 app.use(cookieParser());
 app.use(express.json());
 

@@ -8,17 +8,12 @@ function Login() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
 
-    interface LoginResponse {
-        token: string;
-    }
-
     async function handleLogin(e: React.FormEvent<HTMLFormElement>): Promise<void> {
         e.preventDefault();
         setError("");
 
         try {
-            const res = await api.post<LoginResponse>("/auth/login", { email, password });
-            localStorage.setItem("token", res.data.token);
+            await api.post("/auth/login", { email, password });
             navigate("/");
         } catch (err) {
             setError("登入失敗，請檢查帳密！");
