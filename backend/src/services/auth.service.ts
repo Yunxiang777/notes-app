@@ -12,6 +12,7 @@ import {
   hashPassword,
   comparePassword,
 } from "../utils/jwt.utils";
+import { BadRequest } from "../utils/http";
 
 // 註冊
 export async function register(
@@ -28,7 +29,7 @@ export async function register(
     );
 
     if (existing.length > 0) {
-      throw { status: 409, message: "Email already in use" };
+      throw BadRequest("Email already in use");
     }
 
     // hash 密碼

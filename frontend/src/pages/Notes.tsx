@@ -1,121 +1,76 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import api from "../api/axios";
-
-interface Note {
-    id: number;
-    title: string;
-    content: string;
-}
+import { useState } from "react";
+import { useNotes } from "../hooks/useNotes";
 
 function Notes() {
-    const [notes, setNotes] = useState<Note[] | null>(null);
-    const [title, setTitle] = useState("");
-    const [content, setContent] = useState("");
-    const navigate = useNavigate();
+  const { notes, loading, add, remove } = useNotes();
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
 
-    async function loadNotes() {
-        try {
-            const res = await api.get<{ success: boolean; data: Note[] }>("/notes");
-            setNotes(res.data.data);
-        } catch (err: any) {
-            if (err.response?.status === 401) {
-                navigate("/login");
-            } else {
-                console.error(err);
-            }
-        }
-    }
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    await add(title, content);
+    setTitle("");
+    setContent("");
+  }
 
-    async function addNote(e: React.FormEvent) {
-        e.preventDefault();
-        try {
-            await api.post("/notes", { title, content });
-            setTitle("");
-            setContent("");
-            loadNotes();
-        } catch (err: any) {
-            if (err.response?.status === 401) return navigate("/login");
-            console.error(err);
-        }
-    }
+  if (loading || notes === null)
+    return <div className="container mt-5 text-center fs-4">Loading...</div>;
 
-    async function deleteNote(id: number) {
-        try {
-            await api.delete(`/notes/${id}`);
-            loadNotes();
-        } catch (err: any) {
-            if (err.response?.status === 401) return navigate("/login");
-            console.error(err);
-        }
-    }
+  return (
+    <div className="container mt-4" style={{ maxWidth: "650px" }}>
+      <h2 className="text-center mb-4">📝 我的筆記</h2>
 
-    useEffect(() => {
-        loadNotes();
-    }, []);
-
-    if (notes === null)
-        return (
-            <div className="container mt-5 text-center text-muted fs-4">
-                Loading...
-            </div>
-        );
-
-    return (
-        <div className="container mt-4" style={{ maxWidth: "650px" }}>
-            <h2 className="text-center mb-4">📝 我的筆記</h2>
-
-            {/* 新增筆記表單 */}
-            <div className="card mb-4">
-                <div className="card-body">
-                    <form onSubmit={addNote}>
-                        <div className="mb-3">
-                            <input
-                                type="text"
-                                placeholder="標題"
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                className="form-control"
-                            />
-                        </div>
-
-                        <div className="mb-3">
-                            <textarea
-                                placeholder="內容"
-                                value={content}
-                                onChange={(e) => setContent(e.target.value)}
-                                className="form-control"
-                                rows={4}
-                            />
-                        </div>
-
-                        <button type="submit" className="btn btn-primary w-100">
-                            ➕ 新增筆記
-                        </button>
-                    </form>
-                </div>
+      {/* 新增筆記 */}
+      <div className="card mb-4">
+        <div className="card-body">
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="標題"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
             </div>
 
-            {/* Notes 列表 */}
-            <div className="d-flex flex-column gap-3">
-                {notes.map((n) => (
-                    <div className="card" key={n.id}>
-                        <div className="card-body">
-                            <h5 className="card-title">{n.title}</h5>
-                            <p className="card-text">{n.content}</p>
-
-                            <button
-                                onClick={() => deleteNote(n.id)}
-                                className="btn btn-danger btn-sm"
-                            >
-                                刪除
-                            </button>
-                        </div>
-                    </div>
-                ))}
+            <div className="mb-3">
+              <textarea
+                className="form-control"
+                placeholder="內容"
+                value={content}
+                rows={4}
+                onChange={(e) => setContent(e.target.value)}
+              />
             </div>
+
+            <button className="btn btn-primary w-100" type="submit">
+              ➕ 新增筆記
+            </button>
+          </form>
         </div>
-    );
+      </div>
+
+      {/* 列表 */}
+      <div className="d-flex flex-column gap-3">
+        {notes.map((n) => (
+          <div key={n.id} className="card">
+            <div className="card-body">
+              <h5 className="card-title">{n.title}</h5>
+              <p className="card-text">{n.content}</p>
+
+              <button
+                className="btn btn-danger btn-sm"
+                onClick={() => remove(n.id)}
+              >
+                刪除
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default Notes;
