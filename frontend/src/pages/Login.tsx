@@ -8,45 +8,66 @@ function Login() {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
 
-    async function handleLogin(e: React.FormEvent) {
+    interface LoginResponse {
+        token: string;
+    }
+
+    async function handleLogin(e: React.FormEvent<HTMLFormElement>): Promise<void> {
         e.preventDefault();
         setError("");
 
         try {
-            const res = await api.post("/auth/login", { email, password });
+            const res = await api.post<LoginResponse>("/auth/login", { email, password });
             localStorage.setItem("token", res.data.token);
             navigate("/");
-        } catch (err: any) {
+        } catch (err) {
             setError("登入失敗，請檢查帳密！");
         }
     }
 
     return (
-        <div style={{ padding: 30 }}>
-            <h2>登入</h2>
-            {error && <p style={{ color: "red" }}>{error}</p>}
+        <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
+            <div className="card shadow p-4" style={{ width: "360px", borderRadius: "18px" }}>
+                <h3 className="text-center mb-4">登入</h3>
 
-            <form onSubmit={handleLogin}>
-                <input
-                    type="email"
-                    placeholder="電子郵件"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                /><br />
+                {error && (
+                    <div className="alert alert-danger py-2 text-center">{error}</div>
+                )}
 
-                <input
-                    type="password"
-                    placeholder="密碼"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                /><br />
+                <form onSubmit={handleLogin}>
+                    <div className="mb-3">
+                        <input
+                            type="email"
+                            className="form-control"
+                            placeholder="電子郵件"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                    </div>
 
-                <button type="submit">登入</button>
-            </form>
+                    <div className="mb-3">
+                        <input
+                            type="password"
+                            className="form-control"
+                            placeholder="密碼"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                    </div>
 
-            <p onClick={() => navigate("/register")} style={{ cursor: "pointer" }}>
-                沒有帳號？註冊
-            </p>
+                    <button className="btn btn-primary w-100" type="submit">
+                        登入
+                    </button>
+                </form>
+
+                <p
+                    className="text-center mt-3 text-primary"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => navigate("/register")}
+                >
+                    沒有帳號？註冊
+                </p>
+            </div>
         </div>
     );
 }
